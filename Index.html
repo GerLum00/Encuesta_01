@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Disponibilidad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .question {
+            margin-bottom: 10px;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Encuesta de Disponibilidad</h1>
+    <form id="survey-form">
+        <div id="days-container"></div>
+        <button type="button" onclick="submitForm()">Enviar</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        function generateAvailableDays() {
+            const startDate = new Date("2024-11-26");
+            const endDate = new Date("2024-12-20");
+            const daysContainer = document.getElementById("days-container");
+
+            let currentDate = startDate;
+            while (currentDate <= endDate) {
+                const dayOfWeek = currentDate.getDay(); // 2: Martes, 3: Miércoles, 4: Jueves, 5: Viernes
+                const dayNumber = currentDate.getDate();
+
+                // Excluir el 6 de diciembre (día festivo) y los fines de semana
+                if (dayNumber !== 6 && (dayOfWeek >= 2 && dayOfWeek <= 5)) {
+                    // Formatear la fecha para mostrarla
+                    const formattedDate = currentDate.toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long'
+                    });
+
+                    // Crear las opciones con casillas de verificación
+                    const dayDiv = document.createElement("div");
+                    dayDiv.className = "question";
+                    dayDiv.innerHTML = `
+                        <label>${formattedDate}:</label><br>
+                        <input type="radio" name="day${dayNumber}" value="0"> No puedo<br>
+                        <input type="radio" name="day${dayNumber}" value="1"> Puedo pero no es el mejor día<br>
+                        <input type="radio" name="day${dayNumber}" value="2"> Es mi preferencia<br>
+                    `;
+                    daysContainer.appendChild(dayDiv);
+                }
+
+                // Avanzar al siguiente día
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        }
+
+        function submitForm() {
+            const form = document.getElementById("survey-form");
+            const formData = new FormData(form);
+
+            // Recoger las respuestas seleccionadas
+            const result = {};
+            for (let [key, value] of formData.entries()) {
+                result[key] = value;
+            }
+
+            // Mostrar en consola o enviar a un servidor
+            console.log(result);
+            document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
+        }
+
+        // Generar los días disponibles al cargar la página
+        window.onload = generateAvailableDays;
+    </script>
+</body>
+</html>
