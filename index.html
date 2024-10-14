@@ -1,38 +1,68 @@
-<script>
-    function generateAvailableDays() {
-        const startDate = new Date("2024-11-26");
-        const endDate = new Date("2024-12-20");
-        const daysContainer = document.getElementById("days-container");
-        const excludedDays = ["2024-12-06"];  // Día festivo 6 de diciembre
-
-        let currentDate = startDate;
-        while (currentDate <= endDate) {
-            const dayOfWeek = currentDate.getDay(); // 2: Martes, 3: Miércoles, 4: Jueves, 5: Viernes
-            const dayNumber = currentDate.getDate();
-            const dateString = currentDate.toISOString().split('T')[0];
-
-            // Excluir el 6 de diciembre y fines de semana
-            if (excludedDays.indexOf(dateString) === -1 && (dayOfWeek >= 2 && dayOfWeek <= 5)) {
-                const formattedDate = currentDate.toLocaleDateString('es-ES', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long'
-                });
-
-                const dayDiv = document.createElement("div");
-                dayDiv.className = "question";
-                dayDiv.innerHTML = `
-                    <label>${formattedDate}:</label><br>
-                    <input type="radio" name="day${dateString}" value="0"> No puedo<br>
-                    <input type="radio" name="day${dateString}" value="1"> Puedo pero no es el mejor día<br>
-                    <input type="radio" name="day${dateString}" value="2"> Es mi preferencia<br>
-                `;
-                daysContainer.appendChild(dayDiv);
-            }
-
-            currentDate.setDate(currentDate.getDate() + 1);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Disponibilidad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
         }
-    }
+        .question {
+            margin-bottom: 10px;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Encuesta de Disponibilidad</h1>
+    <form id="survey-form">
+        <div id="days-container"></div>
+        <button type="button" onclick="submitForm()">Enviar</button>
+    </form>
+    <p id="result"></p>
 
-    window.onload = generateAvailableDays;
-</script>
+    <script>
+        function generateAvailableDays() {
+            const startDate = new Date("2024-11-26");
+            const endDate = new Date("2024-12-20");
+            const daysContainer = document.getElementById("days-container");
+            const excludedDays = ["2024-12-06"];  // Día festivo 6 de diciembre
+
+            let currentDate = startDate;
+            while (currentDate <= endDate) {
+                const dayOfWeek = currentDate.getDay(); // 2: Martes, 3: Miércoles, 4: Jueves, 5: Viernes
+                const dayNumber = currentDate.getDate();
+                const dateString = currentDate.toISOString().split('T')[0];
+
+                // Excluir el 6 de diciembre y fines de semana
+                if (excludedDays.indexOf(dateString) === -1 && (dayOfWeek >= 2 && dayOfWeek <= 5)) {
+                    const formattedDate = currentDate.toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long'
+                    });
+
+                    const dayDiv = document.createElement("div");
+                    dayDiv.className = "question";
+                    dayDiv.innerHTML = `
+                        <label>${formattedDate}:</label><br>
+                        <input type="radio" name="day${dateString}" value="0"> No puedo<br>
+                        <input type="radio" name="day${dateString}" value="1"> Puedo pero no es el mejor día<br>
+                        <input type="radio" name="day${dateString}" value="2"> Es mi preferencia<br>
+                    `;
+                    daysContainer.appendChild(dayDiv);
+                }
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        }
+
+        window.onload = generateAvailableDays;
+    </script>
+
+</body>
+</html>
