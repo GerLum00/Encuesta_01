@@ -62,39 +62,54 @@
         }
 
         function submitForm() {
-			const form = document.getElementById("survey-form");
-			const formData = new FormData(form);
-			const formObject = {};
+    			const form = document.getElementById("survey-form");
+    			const formData = new FormData(form);
+   			 const formObject = {};
 
-			for (let [key, value] of formData.entries()) {
-				formObject[key] = value;
+   			 const radios = form.querySelectorAll('input[type="radio"]');
+    			let allSelected = true;
+
+    			radios.forEach(radio => {
+      			  const name = radio.name;
+     			   const selected = form.querySelector(`input[name="${name}"]:checked`);
+      			  if (!selected) {
+         			   allSelected = false;
+       			 }
+  			  });
+
+   			 if (!allSelected) {
+    			    document.getElementById("result").innerText = "Por favor, selecciona una opción para todos los días.";
+     			   return;
+    			}
+
+   			 for (let [key, value] of formData.entries()) {
+    			    formObject[key] = value;
+    			}
+
+    			const scriptURL = 'https://script.google.com/macros/s/AKfycbyhL-UPq4UKpDjtiDMHIDS5m63RmD1ecKglB7vFzxjySCVrH-jNyAYr7xgH16ObFJ6znw/exec'; // Reemplaza con tu URL de Apps Script
+
+    			fetch(scriptURL, {
+     			   method: 'POST',
+     			   body: JSON.stringify(formObject),
+     			   headers: { 'Content-Type': 'application/json' },
+   			 })
+    			.then(response => {
+    			    if (!response.ok) {
+    			        throw new Error('Error en la solicitud: ' + response.statusText);
+     			   }
+     			   return response.json();
+  			  })
+  			  .then(result => {
+  			      document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
+  			  })
+  			  .catch(error => {
+   			     console.error('Error al enviar el formulario:', error);
+     			   document.getElementById("result").innerText = `Hubo un error al enviar el formulario: ${error.message}`;
+    			    // Ver log en la consola para más detalles
+       			 console.log('Detalles del error:', error);
+   			 });
 			}
-
-			// URL de la API web de Google Apps Script
-			const scriptURL = 'https://script.google.com/macros/s/AKfycbz5hYvXF0aP8d-8xnvBZFmy3d_rZO_8ywJIpzX7jqwjmTNUzy_gNF7xYKJ-GQejI54l_g/exec'; // Reemplaza con tu URL de Apps Script
-
-			fetch(scriptURL, {
-				method: 'POST',
-				body: JSON.stringify(formObject),
-				headers: { 'Content-Type': 'application/json' },
-			})
-			.then(response => {
-				if (!response.ok) {
-					throw new Error('Error en la solicitud: ' + response.statusText);
-				}
-				return response.json();
-			})
-			.then(result => {
-				document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
-			})
-			.catch(error => {
-				console.error('Error al enviar el formulario:', error);
-				document.getElementById("result").innerText = "Hubo un error al enviar el formulario. Inténtalo de nuevo.";
-			});
-		}
-
-
-        window.onload = generateAvailableDays;
+	
     </script>
 </body>
 </html>
