@@ -51,8 +51,8 @@
                     dayDiv.innerHTML = `
                         <label>${formattedDate}:</label><br>
                         <input type="radio" name="day${dayNumber}" value="0"> No puedo<br>
-                        <input type="radio" name="day${dayNumber}" value="1"> Puedo pero no es el mejor día<br>
-                        <input type="radio" name="day${dayNumber}" value="2"> Es mi preferencia<br>
+                        <input type="radio" name="day${dayNumber}" value="1"> Puedo pero no es mi preferencia<br>
+                        <input type="radio" name="day${dayNumber}" value="2"> Si puedo<br>
                     `;
                     daysContainer.appendChild(dayDiv);
                 }
@@ -62,28 +62,37 @@
         }
 
         function submitForm() {
-            const form = document.getElementById("survey-form");
-            const formData = new FormData(form);
-            const formObject = {};
+			const form = document.getElementById("survey-form");
+			const formData = new FormData(form);
+			const formObject = {};
 
-            for (let [key, value] of formData.entries()) {
-                formObject[key] = value;
-            }
+			for (let [key, value] of formData.entries()) {
+				formObject[key] = value;
+			}
 
-            // URL de la API web de Google Apps Script
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyhL-UPq4UKpDjtiDMHIDS5m63RmD1ecKglB7vFzxjySCVrH-jNyAYr7xgH16ObFJ6znw/exec'; // Reemplaza con tu URL de Apps Script
+			// URL de la API web de Google Apps Script
+			const scriptURL = 'https://script.google.com/macros/s/AKfycbyhL-UPq4UKpDjtiDMHIDS5m63RmD1ecKglB7vFzxjySCVrH-jNyAYr7xgH16ObFJ6znw/exec'; // Reemplaza con tu URL de Apps Script
 
-            fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify(formObject),
-                headers: { 'Content-Type': 'application/json' },
-            })
-            .then(response => response.json())
-            .then(result => {
-                document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
-            })
-            .catch(error => console.error('Error al enviar el formulario:', error));
-        }
+			fetch(scriptURL, {
+				method: 'POST',
+				body: JSON.stringify(formObject),
+				headers: { 'Content-Type': 'application/json' },
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error('Error en la solicitud: ' + response.statusText);
+				}
+				return response.json();
+			})
+			.then(result => {
+				document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
+			})
+			.catch(error => {
+				console.error('Error al enviar el formulario:', error);
+				document.getElementById("result").innerText = "Hubo un error al enviar el formulario. Inténtalo de nuevo.";
+			});
+		}
+
 
         window.onload = generateAvailableDays;
     </script>
