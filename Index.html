@@ -30,22 +30,22 @@
             const startDate = new Date("2024-11-26");
             const endDate = new Date("2024-12-20");
             const daysContainer = document.getElementById("days-container");
+            const excludedDays = ["2024-12-06"];  // Día festivo 6 de diciembre
 
             let currentDate = startDate;
             while (currentDate <= endDate) {
                 const dayOfWeek = currentDate.getDay(); // 2: Martes, 3: Miércoles, 4: Jueves, 5: Viernes
                 const dayNumber = currentDate.getDate();
+                const dateString = currentDate.toISOString().split('T')[0];
 
-                // Excluir el 6 de diciembre (día festivo) y los fines de semana
-                if (dayNumber !== 6 && (dayOfWeek >= 2 && dayOfWeek <= 5)) {
-                    // Formatear la fecha para mostrarla
+                // Excluir el 6 de diciembre y fines de semana
+                if (excludedDays.indexOf(dateString) === -1 && (dayOfWeek >= 2 && dayOfWeek <= 5)) {
                     const formattedDate = currentDate.toLocaleDateString('es-ES', {
                         weekday: 'long',
                         day: 'numeric',
                         month: 'long'
                     });
 
-                    // Crear las opciones con casillas de verificación
                     const dayDiv = document.createElement("div");
                     dayDiv.className = "question";
                     dayDiv.innerHTML = `
@@ -57,7 +57,6 @@
                     daysContainer.appendChild(dayDiv);
                 }
 
-                // Avanzar al siguiente día
                 currentDate.setDate(currentDate.getDate() + 1);
             }
         }
@@ -65,19 +64,28 @@
         function submitForm() {
             const form = document.getElementById("survey-form");
             const formData = new FormData(form);
+            const formObject = {};
 
-            // Recoger las respuestas seleccionadas
-            const result = {};
             for (let [key, value] of formData.entries()) {
-                result[key] = value;
+                formObject[key] = value;
             }
 
-            // Mostrar en consola o enviar a un servidor
-            console.log(result);
-            document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
+            // URL de la API web de Google Apps Script
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyhL-UPq4UKpDjtiDMHIDS5m63RmD1ecKglB7vFzxjySCVrH-jNyAYr7xgH16ObFJ6znw/exec
+'; // Reemplaza con tu URL de Apps Script
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(formObject),
+                headers: { 'Content-Type': 'application/json' },
+            })
+            .then(response => response.json())
+            .then(result => {
+                document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
+            })
+            .catch(error => console.error('Error al enviar el formulario:', error));
         }
 
-        // Generar los días disponibles al cargar la página
         window.onload = generateAvailableDays;
     </script>
 </body>
