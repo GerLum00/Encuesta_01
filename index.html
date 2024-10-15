@@ -48,12 +48,12 @@
 
                     const dayDiv = document.createElement("div");
                     dayDiv.className = "question";
-                    dayDiv.innerHTML = 
+                    dayDiv.innerHTML = `
                         <label>${formattedDate}:</label><br>
                         <input type="radio" name="day${dayNumber}" value="0"> No puedo<br>
                         <input type="radio" name="day${dayNumber}" value="1"> Puedo pero no es mi preferencia<br>
-                        <input type="radio" name="day${dayNumber}" value="2"> Si puedo<br>
-                    ;
+                        <input type="radio" name="day${dayNumber}" value="2"> Sí puedo<br>
+                    `;
                     daysContainer.appendChild(dayDiv);
                 }
 
@@ -61,39 +61,40 @@
             }
         }
 
-    function submitForm() {
-        const form = document.getElementById("survey-form");
-        const formData = new FormData(form);
+        function submitForm() {
+            const form = document.getElementById("survey-form");
+            const formData = new FormData(form);
 
-        // Convertir FormData a una cadena URL-encoded
-        const urlEncodedData = new URLSearchParams();
-        for (const [key, value] of formData.entries()) {
-            urlEncodedData.append(key, value);
+            // Convertir FormData a una cadena URL-encoded
+            const urlEncodedData = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                urlEncodedData.append(key, value);
+            }
+
+            // URL de la API web de Google Apps Script
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzGMg40FJpqOwz-1SUoJLVgACXohhRnHr50T3xiNi2GDSWGkkYcRM3yH9ZXMJ6xhRTW-Q/exec'; // Reemplaza con tu URL de Apps Script
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: urlEncodedData.toString(),
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la solicitud: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(result => {
+                document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
+            })
+            .catch(error => {
+                console.error('Error al enviar el formulario:', error);
+                document.getElementById("result").innerText = "Hubo un error al enviar el formulario. Inténtalo de nuevo.";
+            });
         }
 
-        // URL de la API web de Google Apps Script
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzGMg40FJpqOwz-1SUoJLVgACXohhRnHr50T3xiNi2GDSWGkkYcRM3yH9ZXMJ6xhRTW-Q/exec'; // Reemplaza con tu URL de Apps Script
-
-        fetch(scriptURL, {
-            method: 'POST',
-            body: urlEncodedData.toString(),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la solicitud: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(result => {
-            document.getElementById("result").innerText = "¡Gracias por enviar tu respuesta!";
-        })
-        .catch(error => {
-            console.error('Error al enviar el formulario:', error);
-            document.getElementById("result").innerText = "Hubo un error al enviar el formulario. Inténtalo de nuevo.";
-        });
-    }
-    window.onload = generateAvailableDays;
+        window.onload = generateAvailableDays;
     </script>
 </body>
 </html>
